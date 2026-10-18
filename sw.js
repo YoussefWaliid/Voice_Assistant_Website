@@ -1,5 +1,5 @@
 // تحكم البيت: الصفحة من الكاش فوراً + تحديث في الخلفية، والأيقونات cache-first
-const CACHE = 'home-remote-v3';
+const CACHE = 'home-remote-v6';
 const SHELL = ['./', 'manifest.webmanifest', 'favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

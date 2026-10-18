@@ -125,6 +125,14 @@ h2{font:600 17px/1.3 var(--font);margin:0}
 .meter span{font-size:12.5px;color:var(--mute)}
 .meter div+div{border-inline-start:1px solid var(--line)}
 .rcard.dis{opacity:.55}
+.killall{width:100%;height:64px;border-radius:18px;border:1px solid color-mix(in srgb,var(--bnfg) 40%,var(--line));background:var(--bnbg);color:var(--bnfg);font:700 20px var(--font);letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 14px}
+.killall svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.killall:active{transform:scale(.985)}
+.killall:disabled{opacity:.6}
+#killDlg p{margin:6px 0 0;line-height:1.7;font-size:15px}
+#killDlg .actions{display:flex;gap:8px;margin-top:16px}
+#killDlg .actions .run{flex:1}
+#killDlg .go{background:var(--bnbg);color:var(--bnfg);border:1px solid color-mix(in srgb,var(--bnfg) 40%,var(--line))}
 .stbar{display:flex;gap:8px;margin-top:12px}
 .stbar button{flex:1;border:0;border-radius:13px;height:42px;font:600 14.5px var(--font);cursor:pointer;background:var(--runbg);color:var(--runfg)}
 .stbar button.alt{background:var(--field);color:var(--ink);border:1px solid var(--line)}
@@ -230,13 +238,14 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
     <div class="sh"><h2>الأوامر</h2><button class="link" id="editCmds">تعديل</button></div>
     <div class="sub" style="margin:0 2px 8px">الكمبيوتر</div>
     <div class="pcwell" id="pcRow"></div>
-    <button class="more" id="moreBtn" aria-expanded="false" aria-controls="cmds" hidden><span id="moreTx">باقي الأوامر</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     <div id="cmds" hidden></div>
     <div class="byid" id="byidBox" hidden>
       <input id="byId" inputmode="numeric" placeholder="تشغيل برقم أمر">
       <button class="run" id="byIdGo">تشغيل</button>
     </div>
   </section>
+
+  <button class="killall" style="margin:18px 0 0" id="killAll"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg>Everything OFF</button>
 </main>
 
 <div class="dock"><div>
@@ -255,6 +264,11 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
   <div class="actions"><button class="run ghost" id="fCancel">إلغاء</button><button class="run" id="fSave">حفظ واتصال</button></div>
 </dialog>
 <dialog id="pinDlg"></dialog>
+<dialog id="killDlg">
+  <h3>إيقاف كل حاجة؟</h3>
+  <p>هيتطفّى: التليفزيون، الكمبيوتر، المشترك (كل المخارج)، والريليهين (Ceiling Light و Ring Light).</p>
+  <div class="actions"><button class="run ghost" id="killNo" autofocus>إلغاء</button><button class="run go" id="killYes">أيوه، اطفي الكل</button></div>
+</dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -390,7 +404,7 @@ function initHidden(){ if(hidden===null){hidden=[];sv(K_HID,hidden)} }
 /* الأزرار الرئيسية: TV و AC (كروت كبيرة) + PC ON/OFF/SLEEP. بتتربط تلقائي بالاسم، ولو غلط: تعديل ← دوس على الأمر ← تثبيت كـ */
 const K_PIN='va-remote-pins';
 let pins=ls(K_PIN,{}), expanded=false;
-const SLOT_NAME={tv:'TV',ac:'AC',pcOn:'PC · ON',pcOff:'PC · OFF',pcSleep:'PC · SLEEP'};
+const SLOT_NAME={tv:'TV · ON',tvOff:'TV · OFF',ac:'AC · ON',acOff:'AC · OFF',pcOn:'PC · ON',pcOff:'PC · OFF',pcSleep:'PC · SLEEP'};
 const RX={
   pc:/\bpc\b|كمبيوتر|جيمنج|gaming|حاسب|لاب ?توب/i,
   sleep:/sleep|سليب|نوم|سكون|suspend/i,
@@ -415,6 +429,9 @@ function resolve(){
   take('pcSleep',pcAct(RX.sleep));
   take('pcOff',pcAct(RX.off));
   take('pcOn',pcAct(RX.on));
+  const isOff=c=>RX.off.test(c.name||'')&&!/on\s*\/\s*off|toggle|تبديل/i.test(c.name||'');
+  take('tvOff',c=>RX.tv.test(txt(c))&&isOff(c));
+  take('acOff',c=>RX.ac.test(txt(c))&&isOff(c));
   take('tv',c=>RX.tv.test(txt(c)),RX.power);
   take('ac',c=>RX.ac.test(txt(c)),RX.power);
   return out;
@@ -432,8 +449,28 @@ function runSlot(slot,btn,cls){
   if(cls){btn.classList.add(cls);setTimeout(()=>btn.classList.remove(cls),800)}
   else{btn.dataset.s='1';btn.querySelector('.rst').textContent='اتبعت';setTimeout(()=>{btn.dataset.s='0';updatePins()},900)}
 }
-$('#ck-tv').onclick=()=>runSlot('tv',$('#ck-tv'));
-$('#ck-ac').onclick=()=>runSlot('ac',$('#ck-ac'));
+/* TV / AC: زرار واحد toggle. لو فيه أمر إيقاف مربوط بيبعت ON/OFF بالتبادل (الحالة مفترضة ومحفوظة)،
+   ولو مفيش أمر إيقاف بيفضل يبعت نفس الأمر زي الأول. ضغطة طويلة = قلب الحالة المفترضة من غير إرسال (لو اتغيرت بالريموت الأصلي). */
+const K_ST='va-remote-st';
+let slotSt=ls(K_ST,{});
+const isTog=k=>resolve()[k+'Off']!==undefined;
+function pressTog(k,btn){
+  const R=resolve();
+  if(R[k]===undefined){toast(NEED_PIN,true);return}
+  if(R[k+'Off']===undefined){runSlot(k,btn);return}
+  const next=slotSt[k]===1?0:1;
+  if(!send('cmd/run',next?R[k]:R[k+'Off']))return;
+  slotSt[k]=next;sv(K_ST,slotSt);updatePins();
+}
+[['tv','#ck-tv'],['ac','#ck-ac']].forEach(([k,sel])=>{
+  const b=$(sel);let t=null,long=false;
+  b.addEventListener('pointerdown',()=>{long=false;clearTimeout(t);t=setTimeout(()=>{
+    if(!isTog(k))return;long=true;slotSt[k]=slotSt[k]===1?0:1;sv(K_ST,slotSt);updatePins();
+    if(navigator.vibrate)navigator.vibrate(30);toast('اتعدلت الحالة: '+(slotSt[k]?'شغّال':'مطفي'));
+  },650)});
+  ['pointerup','pointerleave','pointercancel'].forEach(e=>b.addEventListener(e,()=>clearTimeout(t)));
+  b.onclick=()=>{if(long){long=false;return}pressTog(k,b)};
+});
 function buildPcRow(){
   const row=$('#pcRow');row.textContent='';
   [['pcOn','ON','on'],['pcOff','OFF','off'],['pcSleep','SLEEP','sleep']].forEach(([k,lab,kind])=>{
@@ -451,7 +488,9 @@ function updatePins(){
   [['tv','#ck-tv'],['ac','#ck-ac']].forEach(([k,sel])=>{
     const b=$(sel),has=R[k]!==undefined;
     b.classList.toggle('dis',!has||!online);
-    b.querySelector('.rst').textContent=!has?'غير مربوط':(b.dataset.s==='1'?'اتبعت':'إرسال');
+    if(isTog(k)){b.dataset.s=slotSt[k]===1?'1':'0'}
+    else if(b.dataset.s!=='1'){b.dataset.s='0'}
+    b.querySelector('.rst').textContent=!has?'غير مربوط':(isTog(k)?(slotSt[k]===1?'شغّال':'مطفي'):(b.dataset.s==='1'?'اتبعت':'إرسال'));
   });
   document.querySelectorAll('#pcRow .pcbtn').forEach(b=>{
     b.classList.toggle('dis',R[b.dataset.slot]===undefined||!online);
@@ -483,19 +522,16 @@ function drawCmds(){
   buildPcRow();
   $('#editCmds').textContent=editing?'تم':'تعديل';
   $('#byidBox').hidden=!editing;
-  const box=$('#cmds'),more=$('#moreBtn');box.textContent='';
+  const box=$('#cmds');box.textContent='';
   if(!cmds.length){
-    more.hidden=true;box.hidden=false;
+    box.hidden=!editing;
     box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));
     updatePins();return;
   }
   const R=resolve(),pinned=new Set(Object.values(R)),hid=new Set(hidden||[]);
   const all=usable();
   const list=editing?all:all.filter(c=>!pinned.has(c.id)&&!hid.has(c.id));
-  more.hidden=editing||!list.length;
-  more.setAttribute('aria-expanded',expanded?'true':'false');
-  $('#moreTx').textContent='باقي الأوامر ('+list.length+')';
-  box.hidden=!(editing||(expanded&&list.length));
+  box.hidden=!editing;
   const groups={};list.forEach(c=>{const k=c.cat||'عام';(groups[k]=groups[k]||[]).push(c)});
   const grid=el('div','grid');
   Object.keys(groups).forEach(k=>{
@@ -516,8 +552,45 @@ function drawCmds(){
   box.append(grid);
   updatePins();
 }
-$('#moreBtn').onclick=()=>{expanded=!expanded;drawCmds()};
 $('#editCmds').onclick=()=>{editing=!editing;drawCmds()};
+
+/* ---------- Everything OFF ---------- */
+const killDlg=$('#killDlg');
+$('#killAll').onclick=()=>{
+  if(!client||!client.connected){toast('مش متصل بالسيرفر',true);return}
+  killDlg.showModal();
+};
+$('#killNo').onclick=()=>killDlg.close();
+$('#killYes').onclick=async()=>{
+  killDlg.close();
+  if(!client||!client.connected){toast('مش متصل بالسيرفر',true);return}
+  const R=resolve(),done=[],skip=[],gap=()=>new Promise(r=>setTimeout(r,350));
+  const steps=[];
+  [['tv','التليفزيون'],['ac','التكييف']].forEach(([k,nm])=>steps.push(()=>{
+    if(R[k+'Off']!==undefined){const ok=send('cmd/run',R[k+'Off']);if(ok){slotSt[k]=0;sv(K_ST,slotSt);done.push(nm)}else skip.push(nm);return ok}
+    // أمر واحد بس (تبديل): نبعته بس لو متسجّل إنه شغال، عشان ما نشغّله بالغلط
+    if(R[k]!==undefined&&slotSt[k]===1){const ok=send('cmd/run',R[k]);if(ok){slotSt[k]=0;sv(K_ST,slotSt);done.push(nm)}else skip.push(nm);return ok}
+    if(R[k]===undefined)skip.push(nm+' (مش مربوط)');
+    return false;
+  }));
+  steps.push(()=>{
+    const id=R.pcOff!==undefined?R.pcOff:R.pcSleep;
+    if(id===undefined){skip.push('الكمبيوتر (مش مربوط)');return false}
+    if(send('cmd/run',id)){done.push('الكمبيوتر');return true}skip.push('الكمبيوتر');return false;
+  });
+  steps.push(()=>{
+    if(!st.got||st.c!==1){skip.push('المشترك (مش متصل)');return false}
+    send('cmd/strip','0:off');done.push('المشترك');return true;
+  });
+  [1,2].forEach(n=>steps.push(()=>{
+    const nm=n===1?'Ceiling Light':'Ring Light';
+    if(send('cmd/relay/'+n,'off')){done.push(nm);return true}skip.push(nm);return false;
+  }));
+  const btn=$('#killAll');btn.disabled=true;
+  for(const f of steps){if(f())await gap()}
+  btn.disabled=false;updatePins();
+  toast(skip.length?('اتطفّى: '+done.join('، ')+' — اتخطّى: '+skip.join('، ')):'اتطفّى كل حاجة',skip.length>0);
+};
 $('#byIdGo').onclick=()=>{const v=$('#byId').value.trim();if(/^\d+$/.test(v))send('cmd/run',v);else toast('اكتب رقم',true)};
 
 /* ---------- say ---------- */
