@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "تحكم البيت",
-  "short_name": "تحكم البيت",
+  "name": "Smart Home",
+  "short_name": "Smart Home",
   "description": "تحكم في الإضاءة والمشترك والأوامر من برا البيت",
   "start_url": "./",
   "scope": "./",
