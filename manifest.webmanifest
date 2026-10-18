@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "تحكم البيت",
+  "short_name": "تحكم البيت",
+  "description": "تحكم في الإضاءة والمشترك والأوامر من برا البيت",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#0f1617",
+  "theme_color": "#0f1617",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

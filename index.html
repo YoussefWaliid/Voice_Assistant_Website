@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#e3e8e4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="تحكم البيت">
 <title>تحكم البيت</title>
 <script>
 (function(){var t=null;try{t=localStorage.getItem('va-remote-theme')}catch(e){}
@@ -403,6 +409,7 @@ $('#theme').onclick=()=>applyTheme(document.documentElement.getAttribute('data-t
 applyTheme(document.documentElement.getAttribute('data-theme'),false);
 
 initHidden();drawCmds();renderAll();connect();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
 </script>
 </body>
