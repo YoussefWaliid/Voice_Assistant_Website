@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#e3e8e4">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -17,7 +18,9 @@ if(t!=='dark'&&t!=='light')t=(window.matchMedia&&matchMedia('(prefers-color-sche
 document.documentElement.setAttribute('data-theme',t);})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"></noscript>
 <style>
 :root{
   --wall:#e3e8e4; --plate:#f6f8f5; --ink:#18272c; --mute:#5b6b6e; --line:#cdd6d1;
@@ -133,6 +136,31 @@ input,dialog input{font:inherit;border:1px solid var(--line);border-radius:13px;
 .run{border:0;background:var(--runbg);color:var(--runfg);border-radius:13px;min-width:76px;height:44px;font:600 15px var(--font);cursor:pointer;padding:0 16px}
 .run:active{transform:scale(.97)}
 
+/* brand */
+.brand{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.brand h1{margin:0}
+.logo{width:38px;height:38px;color:var(--on);flex:none}
+
+/* PC keys + expander */
+.pcwell{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;border-radius:20px;background:var(--well);box-shadow:inset 0 3px 8px var(--wellsh),0 1px 0 var(--hi)}
+.pcbtn{border:0;border-radius:14px;min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;color:var(--ink);font:inherit;
+  background:linear-gradient(180deg,var(--cap1),var(--cap2));box-shadow:0 2px 0 var(--capedge),0 6px 10px var(--capdrop);transition:transform .12s,box-shadow .12s,background .15s}
+.pcbtn:active{transform:translateY(1px)}
+.pcbtn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pcbtn.on svg{color:var(--ok)}.pcbtn.off svg{color:var(--bad)}.pcbtn.sleep svg{color:var(--warn)}
+.pcbtn .pl{font:700 15px/1 var(--font);letter-spacing:.3px;direction:ltr}
+.pcbtn.sent{background:linear-gradient(0deg,var(--capon1),var(--capon2));box-shadow:0 0 0 2px var(--on),0 1px 0 var(--capedge);transform:translateY(2px)}
+.pcbtn.dis{opacity:.55}
+.more{width:100%;margin-top:12px;height:46px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:14px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font:500 15px var(--font);cursor:pointer}
+.more[hidden]{display:none}
+.more svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.more[aria-expanded="true"] svg{transform:rotate(180deg)}
+#cmds{margin-top:12px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+.pgrid .ghostbtn,#pinDlg .ghostbtn.wide{height:42px}
+#pinDlg .ghostbtn.wide{width:100%;margin-top:8px}
+.ghostbtn.sel{border-color:var(--on);background:var(--on-soft)}
+
 /* dock */
 .dock{position:fixed;inset-inline:0;bottom:0;padding:18px 14px calc(env(safe-area-inset-bottom,0px) + 12px);
   background:linear-gradient(to top,var(--wall) 62%,transparent)}
@@ -162,7 +190,7 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
 <main>
   <header>
     <div>
-      <h1>تحكم البيت</h1>
+      <div class="brand"><svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M3 24.5 24 5.5 45 24.5Z" fill="currentColor"/><rect x="7" y="27.5" width="34" height="16.5" rx="3" fill="currentColor"/><path d="M19.5 44V33.6a2.6 2.6 0 0 1 2.6-2.6h3.8a2.6 2.6 0 0 1 2.6 2.6V44Z" fill="var(--wall)"/><circle cx="24" cy="17.2" r="3.2" fill="var(--warn)"/></svg><h1>تحكم البيت</h1></div>
       <div class="chip" id="chip"><i></i><span id="chipTx">غير متصل</span></div>
     </div>
     <div class="tools">
@@ -174,10 +202,12 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
   <div class="banner" id="offline" hidden>الجهاز في البيت مش متصل بالسيرفر حالياً. الأوامر مش هتتنفّذ لحد ما يرجع.</div>
 
   <section>
-    <div class="sh"><h2>الإضاءة</h2></div>
+    <div class="sh"><h2>الأجهزة</h2></div>
     <div class="relays">
       <button class="rcard" id="rk1" data-s=""><div class="well"><div class="cap"></div></div><span class="rname">Ceiling Light</span><span class="rst">—</span></button>
       <button class="rcard" id="rk2" data-s=""><div class="well"><div class="cap"></div></div><span class="rname">Ring Light</span><span class="rst">—</span></button>
+      <button class="rcard" id="ck-tv" data-s="0"><div class="well"><div class="cap"></div></div><span class="rname">TV</span><span class="rst">إرسال</span></button>
+      <button class="rcard" id="ck-ac" data-s="0"><div class="well"><div class="cap"></div></div><span class="rname">AC</span><span class="rst">إرسال</span></button>
     </div>
   </section>
 
@@ -198,7 +228,10 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
 
   <section>
     <div class="sh"><h2>الأوامر</h2><button class="link" id="editCmds">تعديل</button></div>
-    <div id="cmds"></div>
+    <div class="sub" style="margin:0 2px 8px">الكمبيوتر</div>
+    <div class="pcwell" id="pcRow"></div>
+    <button class="more" id="moreBtn" aria-expanded="false" aria-controls="cmds" hidden><span id="moreTx">باقي الأوامر</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div id="cmds" hidden></div>
     <div class="byid" id="byidBox" hidden>
       <input id="byId" inputmode="numeric" placeholder="تشغيل برقم أمر">
       <button class="run" id="byIdGo">تشغيل</button>
@@ -221,6 +254,7 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
   <div class="note">البيانات بتتحفظ في متصفح الموبايل ده بس، مش بتتبعت لأي مكان غير السيرفر بتاعك.</div>
   <div class="actions"><button class="run ghost" id="fCancel">إلغاء</button><button class="run" id="fSave">حفظ واتصال</button></div>
 </dialog>
+<dialog id="pinDlg"></dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -288,7 +322,7 @@ function renderAll(){
   const on=client&&client.connected;
   if(on){ if(devOnline===true)setChip('on','الجهاز متصل'); else if(devOnline===false)setChip('bad','الجهاز غير متصل'); else setChip('warn','متصل بالسيرفر') }
   $('#offline').hidden=!(on&&devOnline===false);
-  renderRelays();renderStrip();
+  renderRelays();renderStrip();updatePins();
 }
 
 /* ---------- relays ---------- */
@@ -352,15 +386,116 @@ $('#allOff').onclick=()=>stripAll('off');
 /* ---------- commands ---------- */
 const NOT_HERE=/ring|رينج|سقف|ceiling|celling/i;   // الإضاءة بقت مفاتيح ريلاي، فبتتشال من الأوامر
 function initHidden(){ if(hidden===null){hidden=[];sv(K_HID,hidden)} }
+
+/* الأزرار الرئيسية: TV و AC (كروت كبيرة) + PC ON/OFF/SLEEP. بتتربط تلقائي بالاسم، ولو غلط: تعديل ← دوس على الأمر ← تثبيت كـ */
+const K_PIN='va-remote-pins';
+let pins=ls(K_PIN,{}), expanded=false;
+const SLOT_NAME={tv:'TV',ac:'AC',pcOn:'PC · ON',pcOff:'PC · OFF',pcSleep:'PC · SLEEP'};
+const RX={
+  pc:/\bpc\b|كمبيوتر|جيمنج|gaming|حاسب|لاب ?توب/i,
+  sleep:/sleep|سليب|نوم|سكون|suspend/i,
+  off:/\boff\b|shut ?down|اطفاء|إطفاء|اطفي|أطفي|اقفل|أقفل|اغلاق|إغلاق|ايقاف|إيقاف|وقف/i,
+  on:/\bon\b|تشغيل|شغل|شغّل|wake|فتح|افتح|start/i,
+  tv:/\btv\b|تلفزيون|تليفزيون|تلفاز|شاشة/i,
+  ac:/\bac\b|a\/c|تكييف|مكيف|air ?con/i,
+  power:/power|باور|تشغيل|on\/off|toggle|\bon\b|\boff\b|اطفاء|إطفاء/i
+};
+const usable=()=>cmds.filter(c=>!NOT_HERE.test(c.name||''));
+function resolve(){
+  const L=usable(), out={}, used=new Set();
+  Object.keys(SLOT_NAME).forEach(k=>{const id=pins[k]; if(id!=null&&id!==-1&&L.some(c=>c.id===id)){out[k]=id;used.add(id)}});
+  const txt=c=>(c.name||'')+' '+(c.cat||'');
+  const take=(slot,pred,prefer)=>{
+    if(out[slot]!==undefined||pins[slot]===-1)return;
+    let m=L.filter(c=>!used.has(c.id)&&pred(c));
+    if(prefer){const q=m.filter(c=>prefer.test(c.name||''));if(q.length)m=q}
+    if(m.length){out[slot]=m[0].id;used.add(m[0].id)}
+  };
+  const pcAct=rx=>c=>RX.pc.test(txt(c))&&rx.test(c.name||'');
+  take('pcSleep',pcAct(RX.sleep));
+  take('pcOff',pcAct(RX.off));
+  take('pcOn',pcAct(RX.on));
+  take('tv',c=>RX.tv.test(txt(c)),RX.power);
+  take('ac',c=>RX.ac.test(txt(c)),RX.power);
+  return out;
+}
+const ICON={
+  on:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg>',
+  off:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg>',
+  sleep:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>'
+};
+const NEED_PIN='اربط الأمر الأول: تعديل ← دوس على الأمر ← تثبيت كـ';
+function runSlot(slot,btn,cls){
+  const id=resolve()[slot];
+  if(id===undefined){toast(NEED_PIN,true);return}
+  if(!send('cmd/run',id))return;
+  if(cls){btn.classList.add(cls);setTimeout(()=>btn.classList.remove(cls),800)}
+  else{btn.dataset.s='1';btn.querySelector('.rst').textContent='اتبعت';setTimeout(()=>{btn.dataset.s='0';updatePins()},900)}
+}
+$('#ck-tv').onclick=()=>runSlot('tv',$('#ck-tv'));
+$('#ck-ac').onclick=()=>runSlot('ac',$('#ck-ac'));
+function buildPcRow(){
+  const row=$('#pcRow');row.textContent='';
+  [['pcOn','ON','on'],['pcOff','OFF','off'],['pcSleep','SLEEP','sleep']].forEach(([k,lab,kind])=>{
+    const b=el('button','pcbtn '+kind);b.dataset.slot=k;
+    b.innerHTML=ICON[kind];                       // نص ثابت (مش من بيانات خارجية)
+    b.append(el('span','pl',lab));
+    b.setAttribute('aria-label','PC '+lab);
+    b.onclick=()=>runSlot(k,b,'sent');
+    row.append(b);
+  });
+}
+function updatePins(){
+  const R=resolve();
+  const online=!!(client&&client.connected)&&devOnline!==false;
+  [['tv','#ck-tv'],['ac','#ck-ac']].forEach(([k,sel])=>{
+    const b=$(sel),has=R[k]!==undefined;
+    b.classList.toggle('dis',!has||!online);
+    b.querySelector('.rst').textContent=!has?'غير مربوط':(b.dataset.s==='1'?'اتبعت':'إرسال');
+  });
+  document.querySelectorAll('#pcRow .pcbtn').forEach(b=>{
+    b.classList.toggle('dis',R[b.dataset.slot]===undefined||!online);
+  });
+}
+function openPin(c){
+  const d=$('#pinDlg'),R=resolve();d.textContent='';
+  const cur=Object.keys(R).find(k=>R[k]===c.id);
+  d.append(el('h3','',c.name),el('div','sub','تثبيت كزرار رئيسي'));
+  const g=el('div','pgrid');
+  Object.keys(SLOT_NAME).forEach(k=>{
+    const b=el('button','ghostbtn'+(cur===k?' sel':''),SLOT_NAME[k]);
+    b.onclick=()=>{
+      Object.keys(pins).forEach(x=>{if(pins[x]===c.id)delete pins[x]});
+      pins[k]=c.id;sv(K_PIN,pins);d.close();drawCmds();
+    };
+    g.append(b);
+  });
+  d.append(g);
+  if(cur){const u=el('button','ghostbtn wide','إلغاء التثبيت');u.onclick=()=>{pins[cur]=-1;sv(K_PIN,pins);d.close();drawCmds()};d.append(u)}
+  const isH=(hidden||[]).includes(c.id);
+  const h=el('button','ghostbtn wide',isH?'إظهار في قايمة الأوامر':'إخفاء من قايمة الأوامر');
+  h.onclick=()=>{const s=new Set(hidden||[]);s.has(c.id)?s.delete(c.id):s.add(c.id);hidden=[...s];sv(K_HID,hidden);d.close();drawCmds()};
+  d.append(h);
+  const x=el('button','ghostbtn wide','إغلاق');x.onclick=()=>d.close();d.append(x);
+  d.showModal();
+}
 function drawCmds(){
-  const box=$('#cmds');box.textContent='';
+  buildPcRow();
   $('#editCmds').textContent=editing?'تم':'تعديل';
   $('#byidBox').hidden=!editing;
-  const all=cmds.filter(c=>!NOT_HERE.test(c.name||''));
-  if(!all.length){box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));return}
-  const hid=new Set(hidden||[]);
-  const list=editing?all:all.filter(c=>!hid.has(c.id));
-  if(!list.length){box.append(el('div','empty','كل الأوامر مخفية. دوس "تعديل" لإظهارها.'));return}
+  const box=$('#cmds'),more=$('#moreBtn');box.textContent='';
+  if(!cmds.length){
+    more.hidden=true;box.hidden=false;
+    box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));
+    updatePins();return;
+  }
+  const R=resolve(),pinned=new Set(Object.values(R)),hid=new Set(hidden||[]);
+  const all=usable();
+  const list=editing?all:all.filter(c=>!pinned.has(c.id)&&!hid.has(c.id));
+  more.hidden=editing||!list.length;
+  more.setAttribute('aria-expanded',expanded?'true':'false');
+  $('#moreTx').textContent='باقي الأوامر ('+list.length+')';
+  box.hidden=!(editing||(expanded&&list.length));
   const groups={};list.forEach(c=>{const k=c.cat||'عام';(groups[k]=groups[k]||[]).push(c)});
   const grid=el('div','grid');
   Object.keys(groups).forEach(k=>{
@@ -369,16 +504,19 @@ function drawCmds(){
       const isH=hid.has(c.id);
       const t=el('button','tile'+(editing&&isH?' hid':''));
       t.append(el('span','t1',c.name));
-      t.append(el('span','t2',editing?(isH?'مخفي · دوس للإظهار':'ظاهر · دوس للإخفاء'):'تشغيل'));
+      const slot=Object.keys(R).find(x=>R[x]===c.id);
+      t.append(el('span','t2',editing?((slot?'مثبت: '+SLOT_NAME[slot]+' · ':'')+(isH?'مخفي':'ظاهر')):'تشغيل'));
       t.onclick=()=>{
-        if(editing){const s=new Set(hidden||[]);s.has(c.id)?s.delete(c.id):s.add(c.id);hidden=[...s];sv(K_HID,hidden);drawCmds();return}
+        if(editing){openPin(c);return}
         if(send('cmd/run',c.id)){t.classList.add('sent');setTimeout(()=>t.classList.remove('sent'),700)}
       };
       grid.append(t);
     });
   });
   box.append(grid);
+  updatePins();
 }
+$('#moreBtn').onclick=()=>{expanded=!expanded;drawCmds()};
 $('#editCmds').onclick=()=>{editing=!editing;drawCmds()};
 $('#byIdGo').onclick=()=>{const v=$('#byId').value.trim();if(/^\d+$/.test(v))send('cmd/run',v);else toast('اكتب رقم',true)};
 
