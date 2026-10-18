@@ -3,77 +3,140 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#dfe5e1">
+<meta name="theme-color" content="#e3e8e4">
 <title>تحكم البيت</title>
+<script>
+(function(){var t=null;try{t=localStorage.getItem('va-remote-theme')}catch(e){}
+if(t!=='dark'&&t!=='light')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --wall:#dfe5e1; --plate:#f4f6f3; --ink:#1b2a2f; --mute:#5d6d70; --line:#c9d2cd;
-  --on:#1f6f8b; --on-soft:#d6e8ee; --bad:#b8402b; --ok:#2f7d4f;
+  --wall:#e3e8e4; --plate:#f6f8f5; --ink:#18272c; --mute:#5b6b6e; --line:#cdd6d1;
+  --on:#1f6f8b; --onfg:#fff; --on-soft:#d9eaf0; --bad:#b8402b; --ok:#2f7d4f; --warn:#c98f17;
+  --field:#fff; --hi:#fff; --runbg:#18272c; --runfg:#fff; --tbg:#18272c; --tfg:#fff;
+  --well:#ccd4cf; --wellsh:rgba(24,39,44,.30); --wellon:rgba(31,111,139,.5);
+  --cap1:#fcfdfc; --cap2:#dde4e0; --capedge:#b2bcb7; --capdrop:rgba(24,39,44,.2);
+  --capon1:#f2f9fb; --capon2:#a9d0de; --glow:rgba(31,111,139,.16);
+  --bnbg:#f6e3de; --bnfg:#7d2a1b;
   --font:'IBM Plex Sans Arabic',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --wall:#0f1617; --plate:#192325; --ink:#e5ecea; --mute:#93a4a1; --line:#2f3f3d;
+  --on:#5db3d0; --onfg:#0b181c; --on-soft:#1c3841; --bad:#e0715c; --ok:#5cc489; --warn:#e0b04a;
+  --field:#121a1b; --hi:rgba(255,255,255,.05); --runbg:#33474b; --runfg:#eef4f2; --tbg:#e5ecea; --tfg:#0f1a1c;
+  --well:#0b1112; --wellsh:rgba(0,0,0,.7); --wellon:rgba(93,179,208,.55);
+  --cap1:#3b494b; --cap2:#262f2f; --capedge:#080d0d; --capdrop:rgba(0,0,0,.55);
+  --capon1:#2a4a56; --capon2:#4b92aa; --glow:rgba(93,179,208,.14);
+  --bnbg:#3a1f19; --bnfg:#f0b9ac;
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
 body{background:var(--wall);color:var(--ink);font:400 16px/1.6 var(--font);
-  padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 28px);}
-main{max-width:520px;margin:0 auto;display:grid;gap:16px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 4px 0}
-h1{font:600 22px/1.2 var(--font);margin:0}
-.lamp{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:14px}
-.lamp i{width:10px;height:10px;border-radius:50%;background:#9aa7a3;box-shadow:0 0 0 3px #e9eeeb}
-.lamp.on i{background:var(--ok);box-shadow:0 0 0 3px #cfe6d8}
-.lamp.warn i{background:#d19a1f;box-shadow:0 0 0 3px #f2e4bf}
-.iconbtn{border:1px solid var(--line);background:var(--plate);border-radius:12px;width:42px;height:42px;font-size:20px;color:var(--ink);cursor:pointer}
-.banner{background:#f6e3de;color:#7d2a1b;border-radius:12px;padding:10px 14px;font-size:14px}
+  padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 104px);transition:background .2s,color .2s}
+main{max-width:520px;margin:0 auto;display:grid;gap:14px}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--on);outline-offset:2px}
+
+/* header */
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:2px 2px 4px}
+h1{font:700 26px/1.15 var(--font);margin:0 0 6px;letter-spacing:-.2px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);background:var(--plate);border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 10px}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--mute);flex:none}
+.chip.on i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
+.chip.warn i{background:var(--warn);animation:pulse 1.2s ease-in-out infinite}
+.chip.bad i{background:var(--bad)}
+@keyframes pulse{50%{opacity:.35}}
+.tools{display:flex;gap:8px}
+.iconbtn{border:1px solid var(--line);background:var(--plate);border-radius:13px;width:42px;height:42px;font-size:19px;color:var(--ink);cursor:pointer}
+.banner{background:var(--bnbg);color:var(--bnfg);border-radius:14px;padding:10px 14px;font-size:14px}
 .banner[hidden]{display:none}
-section{background:var(--plate);border-radius:20px;padding:16px;box-shadow:0 1px 0 #fff inset,0 0 0 1px var(--line)}
-h2{font:600 16px/1.3 var(--font);margin:0 0 12px;color:var(--mute)}
-.rockers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.rk{display:flex;flex-direction:column;align-items:center;gap:10px;background:none;border:0;padding:6px 0 2px;font:inherit;color:inherit;cursor:pointer}
-.well{width:92px;height:138px;border-radius:20px;background:#ccd4cf;box-shadow:inset 0 3px 8px rgba(27,42,47,.28),0 1px 0 #fff;padding:7px;perspective:420px}
-.cap{width:100%;height:100%;border-radius:14px;background:linear-gradient(180deg,#fbfcfb,#dfe5e1);
-  box-shadow:0 2px 0 #b4beb9,0 6px 10px rgba(27,42,47,.18);transform-origin:50% 50%;
-  transform:rotateX(16deg);transition:transform .16s ease,background .16s ease;
-  display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px;font-size:12px;color:var(--mute)}
-.rk[data-s="1"] .cap{transform:rotateX(-16deg);background:linear-gradient(0deg,#f3f9fb,#b9d8e3);align-items:flex-start;padding:12px 0 0;color:var(--on)}
-.rk[data-s="1"] .well{box-shadow:inset 0 3px 8px rgba(31,111,139,.45),0 1px 0 #fff}
-.rk[data-s=""] .cap{transform:none;opacity:.7}
-.rk b{font-weight:500;font-size:15px}
-.rk.busy .cap{animation:nudge .5s ease-in-out infinite alternate}
-@keyframes nudge{to{transform:rotateX(0deg)}}
-.group{margin:14px 0 4px;font-size:13px;color:var(--mute)}
-.group:first-of-type{margin-top:0}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
-.row:first-of-type{border-top:0}
-.row .nm{flex:1;min-width:0;overflow-wrap:anywhere}
-.run{border:0;background:var(--ink);color:#fff;border-radius:12px;min-width:72px;height:40px;font:500 15px var(--font);cursor:pointer}
-.run:active{transform:scale(.96)}
-.seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.seg button{border:0;background:#fff;height:40px;min-width:62px;font:500 14px var(--font);cursor:pointer;color:var(--ink)}
-.seg button+button{border-inline-start:1px solid var(--line)}
-.seg button.on{background:var(--on);color:#fff}
-.seg button:active{filter:brightness(.92)}
-.nm.ed{cursor:pointer}
-.say{display:flex;gap:8px}
-input,dialog input{font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink);width:100%;min-width:0}
-.say .run{flex:none}
-.empty{color:var(--mute);font-size:14px}
-.tiny{display:flex;gap:8px;margin-top:10px}
-dialog{border:0;border-radius:20px;padding:18px;width:min(92vw,460px);background:var(--plate);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
-dialog::backdrop{background:rgba(20,30,28,.45)}
-dialog h3{margin:0 0 10px;font:600 18px var(--font)}
+
+/* sections */
+section{background:var(--plate);border-radius:22px;padding:16px;box-shadow:0 1px 0 var(--hi) inset,0 0 0 1px var(--line)}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+h2{font:600 17px/1.3 var(--font);margin:0}
+.sub{font-size:13px;color:var(--mute)}
+.link{border:0;background:none;color:var(--on);font:500 14px var(--font);cursor:pointer;padding:4px 2px}
+.ghostbtn{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:11px;height:34px;padding:0 12px;font:500 13.5px var(--font);cursor:pointer}
+.ghostbtn:active{transform:scale(.97)}
+
+/* relays */
+.relays{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rcard{border:1px solid var(--line);background:var(--field);border-radius:18px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:inherit;font:inherit;transition:background .2s,border-color .2s}
+.rcard[data-s="1"]{background:var(--on-soft);border-color:color-mix(in srgb,var(--on) 45%,var(--line))}
+.rcard[data-s=""]{opacity:.65}
+.well{width:84px;height:124px;border-radius:19px;background:var(--well);box-shadow:inset 0 3px 8px var(--wellsh),0 1px 0 var(--hi);padding:6px;perspective:420px}
+.cap{width:100%;height:100%;border-radius:13px;background:linear-gradient(180deg,var(--cap1),var(--cap2));
+  box-shadow:0 2px 0 var(--capedge),0 6px 10px var(--capdrop);transform:rotateX(16deg);transition:transform .16s ease,background .16s ease}
+.rcard[data-s="1"] .cap{transform:rotateX(-16deg);background:linear-gradient(0deg,var(--capon1),var(--capon2))}
+.rcard[data-s="1"] .well{box-shadow:inset 0 3px 8px var(--wellon),0 1px 0 var(--hi)}
+.rcard[data-s=""] .cap{transform:none}
+.rcard.busy .cap{animation:nudge .5s ease-in-out infinite alternate}
+@keyframes nudge{to{transform:rotateX(0)}}
+.rname{font:600 15px/1.2 var(--font);direction:ltr;unicode-bidi:plaintext}
+.rst{font-size:13px;color:var(--mute);margin-top:-4px}
+.rcard[data-s="1"] .rst{color:var(--on);font-weight:500}
+
+/* tiles (commands + strip) */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gtitle{grid-column:1/-1;font-size:13px;color:var(--mute);margin:8px 2px 0}
+.gtitle:first-child{margin-top:0}
+.tile{position:relative;text-align:start;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:16px;
+  padding:12px 12px 11px;min-height:70px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;cursor:pointer;font:500 15px/1.35 var(--font);transition:background .15s,border-color .15s,transform .1s}
+.tile:active{transform:scale(.97)}
+.tile .t1{overflow-wrap:anywhere}
+.tile .t2{font:400 12.5px var(--font);color:var(--mute);display:flex;align-items:center;gap:6px;min-height:18px}
+.tile.sent{background:var(--on-soft);border-color:var(--on)}
+.tile.hid{opacity:.45}
+.tile.hid .t1{text-decoration:line-through}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mute);opacity:.6;flex:none}
+.tile.on{background:var(--on-soft);border-color:color-mix(in srgb,var(--on) 50%,var(--line))}
+.tile.on .dot{background:var(--ok);opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
+.tile.on .t2{color:var(--ink)}
+.tile.off .t2{color:var(--mute)}
+.tile.dis{opacity:.5}
+.tile.pend{animation:pulse 1s ease-in-out infinite}
+.w{margin-inline-start:auto;font-variant-numeric:tabular-nums;color:var(--mute);direction:ltr}
+.tile.on .w{color:var(--on);font-weight:600}
+.stbar{display:flex;gap:8px;margin-top:12px}
+.stbar button{flex:1;border:0;border-radius:13px;height:42px;font:600 14.5px var(--font);cursor:pointer;background:var(--runbg);color:var(--runfg)}
+.stbar button.alt{background:var(--field);color:var(--ink);border:1px solid var(--line)}
+.stbar button:active{transform:scale(.98)}
+.empty{color:var(--mute);font-size:14px;padding:4px 2px}
+.byid{display:flex;gap:8px;margin-top:12px}
+.byid[hidden]{display:none}
+input,dialog input{font:inherit;border:1px solid var(--line);border-radius:13px;padding:10px 12px;background:var(--field);color:var(--ink);width:100%;min-width:0}
+.run{border:0;background:var(--runbg);color:var(--runfg);border-radius:13px;min-width:76px;height:44px;font:600 15px var(--font);cursor:pointer;padding:0 16px}
+.run:active{transform:scale(.97)}
+
+/* dock */
+.dock{position:fixed;inset-inline:0;bottom:0;padding:18px 14px calc(env(safe-area-inset-bottom,0px) + 12px);
+  background:linear-gradient(to top,var(--wall) 62%,transparent)}
+.dock>div{max-width:520px;margin:0 auto;display:flex;gap:8px;background:var(--plate);border:1px solid var(--line);border-radius:18px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.dock input{border:0;background:transparent;padding:10px 12px}
+.dock input:focus-visible{outline:none}
+.dock>div:focus-within{border-color:var(--on)}
+.dock .run{height:42px}
+
+/* dialog + toast */
+dialog{border:0;border-radius:22px;padding:18px;width:min(92vw,460px);background:var(--plate);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,16,15,.55)}
+dialog h3{margin:0 0 6px;font:600 18px var(--font)}
 dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
 .note{font-size:12.5px;color:var(--mute);margin-top:12px}
 .actions{display:flex;gap:8px;margin-top:16px}
 .actions .run{flex:1}
 .actions .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-#toast{position:fixed;inset-inline:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);margin:auto;width:max-content;max-width:90vw;
-  background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast{position:fixed;inset-inline:0;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);margin:auto;width:max-content;max-width:90vw;
+  background:var(--tbg);color:var(--tfg);padding:10px 16px;border-radius:13px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.show{opacity:1}
-#toast.bad{background:var(--bad)}
-@media (prefers-reduced-motion:reduce){.cap,#toast{transition:none}.rk.busy .cap{animation:none}}
-button:focus-visible,input:focus-visible{outline:3px solid var(--on);outline-offset:2px}
+#toast.bad{background:var(--bad);color:#fff}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -81,43 +144,47 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--on);outline-off
   <header>
     <div>
       <h1>تحكم البيت</h1>
-      <div class="lamp" id="lamp"><i></i><span id="lampTx">غير متصل</span></div>
+      <div class="chip" id="chip"><i></i><span id="chipTx">غير متصل</span></div>
     </div>
-    <button class="iconbtn" id="gear" aria-label="الإعدادات">⚙</button>
+    <div class="tools">
+      <button class="iconbtn" id="theme" aria-label="الوضع الداكن" aria-pressed="false">☾</button>
+      <button class="iconbtn" id="gear" aria-label="الإعدادات">⚙</button>
+    </div>
   </header>
 
   <div class="banner" id="offline" hidden>الجهاز في البيت مش متصل بالسيرفر حالياً. الأوامر مش هتتنفّذ لحد ما يرجع.</div>
 
   <section>
-    <h2>الريلاي</h2>
-    <div class="rockers">
-      <button class="rk" id="rk1" data-s=""><div class="well"><div class="cap"></div></div><b>ريلاي 1</b></button>
-      <button class="rk" id="rk2" data-s=""><div class="well"><div class="cap"></div></div><b>ريلاي 2</b></button>
+    <div class="sh"><h2>الإضاءة</h2></div>
+    <div class="relays">
+      <button class="rcard" id="rk1" data-s=""><div class="well"><div class="cap"></div></div><span class="rname">Ceiling Light</span><span class="rst">—</span></button>
+      <button class="rcard" id="rk2" data-s=""><div class="well"><div class="cap"></div></div><span class="rname">Ring Light</span><span class="rst">—</span></button>
     </div>
   </section>
 
   <section>
-    <h2>الأوامر</h2>
-    <div id="cmds"><div class="empty">بانتظار قائمة الأوامر من الجهاز...</div></div>
-    <div class="tiny">
-      <input id="byId" inputmode="numeric" placeholder="أو اكتب رقم أمر">
+    <div class="sh"><h2>المشترك</h2><span class="sub" id="stInfo"></span></div>
+    <div class="grid" id="strip"></div>
+    <div class="stbar">
+      <button id="allOn">تشغيل الكل</button>
+      <button class="alt" id="allOff">إيقاف الكل</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>الأوامر</h2><button class="link" id="editCmds">تعديل</button></div>
+    <div id="cmds"></div>
+    <div class="byid" id="byidBox" hidden>
+      <input id="byId" inputmode="numeric" placeholder="تشغيل برقم أمر">
       <button class="run" id="byIdGo">تشغيل</button>
     </div>
   </section>
-
-  <section>
-    <h2>المشترك</h2>
-    <div id="strip"></div>
-  </section>
-
-  <section>
-    <h2>قول جملة</h2>
-    <div class="say">
-      <input id="sayTx" placeholder="مثلاً: شغل نور السقف" enterkeyhint="send">
-      <button class="run" id="sayGo">إرسال</button>
-    </div>
-  </section>
 </main>
+
+<div class="dock"><div>
+  <input id="sayTx" placeholder="قول جملة: شغل نور السقف" enterkeyhint="send" aria-label="جملة">
+  <button class="run" id="sayGo">إرسال</button>
+</div></div>
 
 <dialog id="dlg">
   <h3>إعدادات الاتصال</h3>
@@ -147,46 +214,44 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--on);outline-off
 <script>
 (function(){
 const $ = s => document.querySelector(s);
-const K_CFG='va-remote-cfg', K_CMD='va-remote-cmds', K_NM='va-remote-names';
+const K_CFG='va-remote-cfg', K_CMD='va-remote-cmds', K_NM='va-remote-names', K_HID='va-remote-hidden';
 const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 let cfg = Object.assign({host:'bc11c1a6.ala.eu-central-1.emqxsl.com',port:8084,user:'',pass:'',prefix:'youssef-va-4827'}, ls(K_CFG,{}));
 let client=null, devOnline=null, relay={1:null,2:null}, names=ls(K_NM,{});
-let cmds=ls(K_CMD,[]);
+let cmds=ls(K_CMD,[]), hidden=ls(K_HID,null), editing=false;
+let st={got:false,c:0,o:[null,null,null,null],w:[0,0,0,0],v:0}, pend={};
 
-/* ---------- toast ---------- */
+/* ---------- helpers ---------- */
 let tt; function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(tt);tt=setTimeout(()=>t.className='',2200)}
 const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
+function setChip(state,txt){const c=$('#chip');c.className='chip '+state;$('#chipTx').textContent=txt}
 
 /* ---------- connection ---------- */
-function setLamp(state,txt){const l=$('#lamp');l.className='lamp '+state;$('#lampTx').textContent=txt}
-function render(){
-  $('#offline').hidden = !(client && client.connected && devOnline===false);
-  ['1','2'].forEach(n=>{const b=$('#rk'+n);b.dataset.s = relay[n]===null?'':(relay[n]?'1':'0');b.classList.remove('busy');
-    b.querySelector('.cap').textContent = relay[n]===null?'':(relay[n]?'شغّال':'مطفي')});
-}
 function connect(){
   if(client){try{client.end(true)}catch(e){} client=null}
-  if(!cfg.host||!cfg.user){setLamp('warn','محتاج إعدادات');openCfg();return}
-  setLamp('warn','بيتصل...');
+  if(!cfg.host||!cfg.user){setChip('warn','محتاج إعدادات');openCfg();return}
+  setChip('warn','بيتصل...');
   const p=cfg.prefix;
   client = mqtt.connect('wss://'+cfg.host+':'+cfg.port+'/mqtt',{
     username:cfg.user,password:cfg.pass,clientId:'phone-'+Math.random().toString(16).slice(2,10),
     keepalive:30,reconnectPeriod:3000,connectTimeout:10000,clean:true,protocolVersion:4});
   client.on('connect',()=>{
-    setLamp('on','متصل بالسيرفر');
+    setChip('warn','متصل بالسيرفر');
     client.subscribe([p+'/status',p+'/state/#',p+'/commands',p+'/result']);
-    render();
+    renderAll();
   });
-  client.on('reconnect',()=>setLamp('warn','بيعيد الاتصال...'));
-  client.on('close',()=>{if(client&&!client.connected)setLamp('warn','غير متصل');});
-  client.on('error',e=>{setLamp('warn','خطأ في الاتصال');});
+  client.on('reconnect',()=>setChip('warn','بيعيد الاتصال...'));
+  client.on('close',()=>{if(client&&!client.connected)setChip('warn','غير متصل');renderAll()});
+  client.on('error',()=>{setChip('bad','خطأ في الاتصال')});
   client.on('message',(topic,buf)=>{
     const t=topic.slice(p.length+1), s=new TextDecoder().decode(buf);
-    if(t==='status'){devOnline=(s==='online');setLamp('on',devOnline?'الجهاز متصل':'الجهاز غير متصل');render()}
-    else if(t==='state/relay/1'||t==='state/relay/2'){relay[t.slice(-1)]=(s==='1');render()}
-    else if(t==='commands'){try{cmds=JSON.parse(s);sv(K_CMD,cmds);drawCmds()}catch(e){}}
+    if(t==='status'){devOnline=(s==='online');renderAll()}
+    else if(t==='state/relay/1'||t==='state/relay/2'){relay[t.slice(-1)]=(s==='1');renderRelays()}
+    else if(t==='state/strip'){try{const j=JSON.parse(s);st={got:true,c:j.c?1:0,o:j.o.map(x=>!!x),w:j.w||[0,0,0,0],v:j.v||0};pend={};renderStrip()}catch(e){}}
+    else if(t==='commands'){try{cmds=JSON.parse(s);sv(K_CMD,cmds);initHidden();drawCmds()}catch(e){}}
     else if(t==='result'){const ok=s.endsWith(':ok');toast(ok?'تم':'فشل التنفيذ ('+s.split(':')[0]+')',!ok)}
   });
 }
@@ -194,49 +259,100 @@ function send(sub,payload){
   if(!client||!client.connected){toast('مش متصل بالسيرفر',true);return false}
   client.publish(cfg.prefix+'/'+sub,String(payload),{qos:0});buzz();return true;
 }
+function renderAll(){
+  const on=client&&client.connected;
+  if(on){ if(devOnline===true)setChip('on','الجهاز متصل'); else if(devOnline===false)setChip('bad','الجهاز غير متصل'); else setChip('warn','متصل بالسيرفر') }
+  $('#offline').hidden=!(on&&devOnline===false);
+  renderRelays();renderStrip();
+}
 
 /* ---------- relays ---------- */
-['1','2'].forEach(n=>{$('#rk'+n).onclick=()=>{
+function renderRelays(){
+  [1,2].forEach(n=>{const b=$('#rk'+n);const v=relay[n];
+    b.dataset.s=v===null?'':(v?'1':'0');b.classList.remove('busy');
+    b.querySelector('.rst').textContent=v===null?'—':(v?'شغّال':'مطفي');});
+}
+[1,2].forEach(n=>{$('#rk'+n).onclick=()=>{
   const cur=relay[n];
-  if(send('cmd/relay/'+n, cur===null?'toggle':(cur?'off':'on'))) $('#rk'+n).classList.add('busy');
+  if(send('cmd/relay/'+n, cur===null?'toggle':(cur?'off':'on'))){$('#rk'+n).classList.add('busy');setTimeout(()=>$('#rk'+n).classList.remove('busy'),3000)}
 }});
 
+/* ---------- strip ---------- */
+const outName=i=>names[i]||('مخرج '+i);
+function renderStrip(){
+  const g=$('#strip');g.textContent='';
+  const live=client&&client.connected&&st.got&&st.c===1;
+  for(let i=1;i<=4;i++){
+    const on=st.got?st.o[i-1]:null;
+    const t=el('button','tile'+(on===true?' on':on===false?' off':'')+(live?'':' dis')+(pend[i]?' pend':''));
+    t.append(el('span','t1',outName(i)));
+    const t2=el('span','t2');
+    t2.append(el('span','dot'));
+    t2.append(el('span','',!st.got?'—':(on?'شغّال':'مطفي')));
+    if(on&&live){const w=Number(st.w[i-1]||0);t2.append(el('span','w',w.toFixed(w<100?1:0)+' W'))}
+    t.append(t2);
+    let timer=null,longed=false;
+    t.addEventListener('pointerdown',()=>{longed=false;timer=setTimeout(()=>{longed=true;const v=prompt('اسم المخرج '+i,outName(i));if(v&&v.trim()){names[i]=v.trim();sv(K_NM,names);renderStrip()}},650)});
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=>t.addEventListener(ev,()=>clearTimeout(timer)));
+    t.onclick=()=>{
+      if(longed)return;
+      if(!st.got||st.c!==1){toast('المشترك غير متصل بالجهاز',true);return}
+      if(send('cmd/strip',i+':'+(on?'off':'on'))){pend[i]=1;renderStrip();setTimeout(()=>{if(pend[i]){delete pend[i];renderStrip()}},3500)}
+    };
+    g.appendChild(t);
+  }
+  const n=st.got?st.o.filter(Boolean).length:0;
+  const info=$('#stInfo');
+  if(!st.got) info.textContent='بانتظار الحالة...';
+  else if(st.c!==1) info.textContent='غير متصل بالجهاز';
+  else info.textContent=(n?n+' من 4 شغّالين':'الكل مطفي')+(st.v?' · '+st.v+' V':'');
+  info.style.color=(st.got&&st.c!==1)?'var(--bad)':'';
+}
+function stripAll(state){
+  if(!st.got||st.c!==1){toast('المشترك غير متصل بالجهاز',true);return}
+  send('cmd/strip','0:'+state);
+}
+$('#allOn').onclick=()=>stripAll('on');
+$('#allOff').onclick=()=>stripAll('off');
+
 /* ---------- commands ---------- */
+const AUTO_HIDE=/ring|رينج|سقف|ceiling|celling/i;   // أوامر الإضاءة موجودة كمفاتيح ريلاي
+function initHidden(){
+  if(hidden!==null||!cmds.length)return;
+  hidden=cmds.filter(c=>AUTO_HIDE.test(c.name||'')).map(c=>c.id);
+  sv(K_HID,hidden);
+}
 function drawCmds(){
-  const box=$('#cmds'); box.textContent='';
-  if(!cmds.length){const d=document.createElement('div');d.className='empty';d.textContent='مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث، أو استخدم رقم الأمر من تحت.';box.appendChild(d);return}
-  const groups={}; cmds.forEach(c=>{(groups[c.cat||'عام']=groups[c.cat||'عام']||[]).push(c)});
-  Object.keys(groups).forEach(g=>{
-    const h=document.createElement('div');h.className='group';h.textContent=g;box.appendChild(h);
-    groups[g].forEach(c=>{
-      const r=document.createElement('div');r.className='row';
-      const n=document.createElement('div');n.className='nm';n.textContent=c.name;
-      const b=document.createElement('button');b.className='run';b.textContent='تشغيل';
-      b.onclick=()=>send('cmd/run',c.id);
-      r.append(n,b);box.appendChild(r);
+  const box=$('#cmds');box.textContent='';
+  $('#editCmds').textContent=editing?'تم':'تعديل';
+  $('#byidBox').hidden=!editing;
+  if(!cmds.length){box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));return}
+  const hid=new Set(hidden||[]);
+  const list=editing?cmds:cmds.filter(c=>!hid.has(c.id));
+  if(!list.length){box.append(el('div','empty','كل الأوامر مخفية. دوس "تعديل" لإظهارها.'));return}
+  const groups={};list.forEach(c=>{const k=c.cat||'عام';(groups[k]=groups[k]||[]).push(c)});
+  const grid=el('div','grid');
+  Object.keys(groups).forEach(k=>{
+    grid.append(el('div','gtitle',k));
+    groups[k].forEach(c=>{
+      const isH=hid.has(c.id);
+      const t=el('button','tile'+(editing&&isH?' hid':''));
+      t.append(el('span','t1',c.name));
+      t.append(el('span','t2',editing?(isH?'مخفي · دوس للإظهار':'ظاهر · دوس للإخفاء'):'تشغيل'));
+      t.onclick=()=>{
+        if(editing){const s=new Set(hidden||[]);s.has(c.id)?s.delete(c.id):s.add(c.id);hidden=[...s];sv(K_HID,hidden);drawCmds();return}
+        if(send('cmd/run',c.id)){t.classList.add('sent');setTimeout(()=>t.classList.remove('sent'),700)}
+      };
+      grid.append(t);
     });
   });
+  box.append(grid);
 }
+$('#editCmds').onclick=()=>{editing=!editing;drawCmds()};
 $('#byIdGo').onclick=()=>{const v=$('#byId').value.trim();if(/^\d+$/.test(v))send('cmd/run',v);else toast('اكتب رقم',true)};
 
-/* ---------- strip ---------- */
-function drawStrip(){
-  const box=$('#strip');box.textContent='';
-  const mk=(label,id,editable)=>{
-    const r=document.createElement('div');r.className='row';
-    const n=document.createElement('div');n.className='nm'+(editable?' ed':'');n.textContent=label;
-    if(editable)n.onclick=()=>{const v=prompt('اسم المخرج '+id,label);if(v&&v.trim()){names[id]=v.trim();sv(K_NM,names);drawStrip()}};
-    const seg=document.createElement('div');seg.className='seg';
-    const on=document.createElement('button');on.textContent='تشغيل';on.onclick=()=>send('cmd/strip',id+':on');
-    const off=document.createElement('button');off.textContent='إيقاف';off.onclick=()=>send('cmd/strip',id+':off');
-    seg.append(on,off);r.append(n,seg);box.appendChild(r);
-  };
-  for(let i=1;i<=4;i++)mk(names[i]||('مخرج '+i),i,true);
-  mk('كل المخارج',0,false);
-}
-
 /* ---------- say ---------- */
-function say(){const v=$('#sayTx').value.trim();if(!v)return;if(send('cmd/say',v))$('#sayTx').value=''}
+function say(){const v=$('#sayTx').value.trim();if(!v)return;if(send('cmd/say',v)){$('#sayTx').value='';toast('اتبعتت للجهاز')}}
 $('#sayGo').onclick=say;
 $('#sayTx').addEventListener('keydown',e=>{if(e.key==='Enter')say()});
 
@@ -247,10 +363,21 @@ $('#gear').onclick=openCfg;
 $('#fCancel').onclick=()=>dlg.close();
 $('#fSave').onclick=()=>{
   cfg={host:$('#fHost').value.trim(),port:parseInt($('#fPort').value,10)||8084,user:$('#fUser').value.trim(),pass:$('#fPass').value,prefix:$('#fPre').value.trim().replace(/\/+$/,'')};
-  sv(K_CFG,cfg);dlg.close();devOnline=null;relay={1:null,2:null};render();connect();
+  sv(K_CFG,cfg);dlg.close();devOnline=null;relay={1:null,2:null};st={got:false,c:0,o:[null,null,null,null],w:[0,0,0,0],v:0};renderAll();connect();
 };
 
-drawCmds();drawStrip();render();connect();
+/* ---------- dark mode ---------- */
+function applyTheme(t,save){
+  document.documentElement.setAttribute('data-theme',t);
+  const b=$('#theme');b.textContent=t==='dark'?'☀':'☾';b.setAttribute('aria-pressed',t==='dark');
+  b.setAttribute('aria-label',t==='dark'?'الوضع الفاتح':'الوضع الداكن');
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0f1617':'#e3e8e4';
+  if(save){try{localStorage.setItem('va-remote-theme',t)}catch(e){}}
+}
+$('#theme').onclick=()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true);
+applyTheme(document.documentElement.getAttribute('data-theme'),false);
+
+initHidden();drawCmds();renderAll();connect();
 })();
 </script>
 </body>
