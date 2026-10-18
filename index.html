@@ -44,7 +44,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--on);outline-off
 
 /* header */
 header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:2px 2px 4px}
-h1{font:700 26px/1.15 var(--font);margin:0 0 6px;letter-spacing:-.2px}
+h1{font:700 28px/1.15 var(--font);margin:0 0 6px;letter-spacing:-.2px}
 .chip{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);background:var(--plate);border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 10px}
 .chip i{width:9px;height:9px;border-radius:50%;background:var(--mute);flex:none}
 .chip.on i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
@@ -57,7 +57,7 @@ h1{font:700 26px/1.15 var(--font);margin:0 0 6px;letter-spacing:-.2px}
 .banner[hidden]{display:none}
 
 /* sections */
-section{background:var(--plate);border-radius:22px;padding:16px;box-shadow:0 1px 0 var(--hi) inset,0 0 0 1px var(--line)}
+section{background:var(--plate);border-radius:24px;padding:18px;box-shadow:0 1px 0 var(--hi) inset,0 0 0 1px var(--line)}
 .sh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
 h2{font:600 17px/1.3 var(--font);margin:0}
 .sub{font-size:13px;color:var(--mute)}
@@ -94,15 +94,28 @@ h2{font:600 17px/1.3 var(--font);margin:0}
 .tile.sent{background:var(--on-soft);border-color:var(--on)}
 .tile.hid{opacity:.45}
 .tile.hid .t1{text-decoration:line-through}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--mute);opacity:.6;flex:none}
-.tile.on{background:var(--on-soft);border-color:color-mix(in srgb,var(--on) 50%,var(--line))}
-.tile.on .dot{background:var(--ok);opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
-.tile.on .t2{color:var(--ink)}
-.tile.off .t2{color:var(--mute)}
-.tile.dis{opacity:.5}
-.tile.pend{animation:pulse 1s ease-in-out infinite}
-.w{margin-inline-start:auto;font-variant-numeric:tabular-nums;color:var(--mute);direction:ltr}
-.tile.on .w{color:var(--on);font-weight:600}
+/* strip: outlets in a recessed well, like the relay switches */
+.sh .chip{background:var(--field);flex:none}
+.strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;border-radius:20px;background:var(--well);box-shadow:inset 0 3px 8px var(--wellsh),0 1px 0 var(--hi)}
+.outlet{border:0;border-radius:14px;padding:11px 13px 10px;min-height:98px;display:flex;flex-direction:column;gap:2px;text-align:start;cursor:pointer;color:var(--ink);font:inherit;
+  background:linear-gradient(180deg,var(--cap1),var(--cap2));box-shadow:0 2px 0 var(--capedge),0 6px 10px var(--capdrop);transition:transform .12s,box-shadow .12s,background .15s}
+.outlet:active{transform:translateY(1px)}
+.outlet.on{background:linear-gradient(0deg,var(--capon1),var(--capon2));box-shadow:0 0 0 2px var(--on),0 1px 0 var(--capedge);transform:translateY(2px)}
+.otop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.oname{font:600 14.5px/1.3 var(--font);overflow-wrap:anywhere}
+.led{width:11px;height:11px;border-radius:50%;flex:none;background:var(--mute);opacity:.45;transition:background .15s,box-shadow .15s}
+.outlet.on .led{background:var(--ok);opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 28%,transparent),0 0 10px var(--ok)}
+.ostate{font:700 21px/1.2 var(--font);margin-top:auto;padding-top:10px;color:var(--mute)}
+.outlet.on .ostate{color:var(--ink)}
+.owatt{font:500 13px/1.4 var(--font);color:var(--mute);unicode-bidi:isolate;font-variant-numeric:tabular-nums;min-height:20px}
+.outlet.on .owatt{color:var(--ink);font-weight:600}
+.outlet.dis{opacity:.55}
+.outlet.pend .ostate{animation:pulse 1s ease-in-out infinite;color:var(--on)}
+.meter{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center}
+.meter b{display:block;font:600 18px/1.3 var(--font);direction:ltr;font-variant-numeric:tabular-nums}
+.meter span{font-size:12.5px;color:var(--mute)}
+.meter div+div{border-inline-start:1px solid var(--line)}
+.rcard.dis{opacity:.55}
 .stbar{display:flex;gap:8px;margin-top:12px}
 .stbar button{flex:1;border:0;border-radius:13px;height:42px;font:600 14.5px var(--font);cursor:pointer;background:var(--runbg);color:var(--runfg)}
 .stbar button.alt{background:var(--field);color:var(--ink);border:1px solid var(--line)}
@@ -163,8 +176,14 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
   </section>
 
   <section>
-    <div class="sh"><h2>المشترك</h2><span class="sub" id="stInfo"></span></div>
-    <div class="grid" id="strip"></div>
+    <div class="sh"><h2>المشترك</h2><span class="chip" id="stPill"><i></i><span id="stPillTx">بانتظار الحالة</span></span></div>
+    <div class="strip" id="strip"></div>
+    <div class="meter">
+      <div><b id="mCount">—</b><span>شغّالين</span></div>
+      <div><b id="mW">—</b><span>الاستهلاك</span></div>
+      <div><b id="mV">—</b><span>الجهد</span></div>
+    </div>
+    <div class="sub" style="margin-top:10px">دوس مطوّل على المخرج لتغيير اسمه</div>
     <div class="stbar">
       <button id="allOn">تشغيل الكل</button>
       <button class="alt" id="allOff">إيقاف الكل</button>
@@ -182,7 +201,7 @@ dialog label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
 </main>
 
 <div class="dock"><div>
-  <input id="sayTx" placeholder="قول جملة: شغل نور السقف" enterkeyhint="send" aria-label="جملة">
+  <input id="sayTx" placeholder="اكتب جملة للمساعد" enterkeyhint="send" aria-label="جملة">
   <button class="run" id="sayGo">إرسال</button>
 </div></div>
 
@@ -269,7 +288,7 @@ function renderAll(){
 /* ---------- relays ---------- */
 function renderRelays(){
   [1,2].forEach(n=>{const b=$('#rk'+n);const v=relay[n];
-    b.dataset.s=v===null?'':(v?'1':'0');b.classList.remove('busy');
+    b.dataset.s=v===null?'':(v?'1':'0');b.classList.remove('busy');b.classList.toggle('dis',devOnline===false);
     b.querySelector('.rst').textContent=v===null?'—':(v?'شغّال':'مطفي');});
 }
 [1,2].forEach(n=>{$('#rk'+n).onclick=()=>{
@@ -281,32 +300,41 @@ function renderRelays(){
 const outName=i=>names[i]||('مخرج '+i);
 function renderStrip(){
   const g=$('#strip');g.textContent='';
-  const live=client&&client.connected&&st.got&&st.c===1;
+  const conn=!!(client&&client.connected);
+  const live=conn&&devOnline!==false&&st.got&&st.c===1;
   for(let i=1;i<=4;i++){
     const on=st.got?st.o[i-1]:null;
-    const t=el('button','tile'+(on===true?' on':on===false?' off':'')+(live?'':' dis')+(pend[i]?' pend':''));
-    t.append(el('span','t1',outName(i)));
-    const t2=el('span','t2');
-    t2.append(el('span','dot'));
-    t2.append(el('span','',!st.got?'—':(on?'شغّال':'مطفي')));
-    if(on&&live){const w=Number(st.w[i-1]||0);t2.append(el('span','w',w.toFixed(w<100?1:0)+' W'))}
-    t.append(t2);
+    const isP=!!pend[i];
+    const t=el('button','outlet'+(live&&on===true?' on':'')+(live?'':' dis')+(isP?' pend':''));
+    const top=el('span','otop');
+    top.append(el('span','oname',outName(i)),el('i','led'));
+    const word=isP?'بيتنفذ...':(!st.got?'—':(!live?'غير متاح':(on?'شغّال':'مطفي')));
+    const w=Number(st.w[i-1]||0);
+    t.append(top,el('span','ostate',word),el('span','owatt',(live&&on)?w.toFixed(w<100?1:0)+' W':'\u00A0'));
+    t.setAttribute('aria-label',outName(i)+': '+word);
     let timer=null,longed=false;
     t.addEventListener('pointerdown',()=>{longed=false;timer=setTimeout(()=>{longed=true;const v=prompt('اسم المخرج '+i,outName(i));if(v&&v.trim()){names[i]=v.trim();sv(K_NM,names);renderStrip()}},650)});
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>t.addEventListener(ev,()=>clearTimeout(timer)));
     t.onclick=()=>{
       if(longed)return;
+      if(devOnline===false){toast('الجهاز غير متصل',true);return}
       if(!st.got||st.c!==1){toast('المشترك غير متصل بالجهاز',true);return}
-      if(send('cmd/strip',i+':'+(on?'off':'on'))){pend[i]=1;renderStrip();setTimeout(()=>{if(pend[i]){delete pend[i];renderStrip()}},3500)}
+      if(send('cmd/strip',i+':'+(on?'off':'on'))){pend[i]=1;renderStrip();setTimeout(()=>{if(pend[i]){delete pend[i];renderStrip();toast('مفيش تأكيد من المشترك',true)}},3500)}
     };
     g.appendChild(t);
   }
-  const n=st.got?st.o.filter(Boolean).length:0;
-  const info=$('#stInfo');
-  if(!st.got) info.textContent='بانتظار الحالة...';
-  else if(st.c!==1) info.textContent='غير متصل بالجهاز';
-  else info.textContent=(n?n+' من 4 شغّالين':'الكل مطفي')+(st.v?' · '+st.v+' V':'');
-  info.style.color=(st.got&&st.c!==1)?'var(--bad)':'';
+  let ps,pt;
+  if(!conn){ps='bad';pt='مش متصل'}
+  else if(devOnline===false){ps='bad';pt='الجهاز غير متصل'}
+  else if(!st.got){ps='warn';pt='بانتظار الحالة'}
+  else if(st.c!==1){ps='bad';pt='المشترك غير متصل'}
+  else{ps='on';pt='المشترك متصل'}
+  $('#stPill').className='chip '+ps;$('#stPillTx').textContent=pt;
+  const n=live?st.o.filter(Boolean).length:0;
+  const tw=live?st.w.reduce((a,x,k)=>a+(st.o[k]?(Number(x)||0):0),0):0;
+  $('#mCount').textContent=live?n+' / 4':'—';
+  $('#mW').textContent=live?(tw<100?tw.toFixed(1):Math.round(tw))+' W':'—';
+  $('#mV').textContent=(live&&st.v)?st.v+' V':'—';
 }
 function stripAll(state){
   if(!st.got||st.c!==1){toast('المشترك غير متصل بالجهاز',true);return}
@@ -316,19 +344,16 @@ $('#allOn').onclick=()=>stripAll('on');
 $('#allOff').onclick=()=>stripAll('off');
 
 /* ---------- commands ---------- */
-const AUTO_HIDE=/ring|رينج|سقف|ceiling|celling/i;   // أوامر الإضاءة موجودة كمفاتيح ريلاي
-function initHidden(){
-  if(hidden!==null||!cmds.length)return;
-  hidden=cmds.filter(c=>AUTO_HIDE.test(c.name||'')).map(c=>c.id);
-  sv(K_HID,hidden);
-}
+const NOT_HERE=/ring|رينج|سقف|ceiling|celling/i;   // الإضاءة بقت مفاتيح ريلاي، فبتتشال من الأوامر
+function initHidden(){ if(hidden===null){hidden=[];sv(K_HID,hidden)} }
 function drawCmds(){
   const box=$('#cmds');box.textContent='';
   $('#editCmds').textContent=editing?'تم':'تعديل';
   $('#byidBox').hidden=!editing;
-  if(!cmds.length){box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));return}
+  const all=cmds.filter(c=>!NOT_HERE.test(c.name||''));
+  if(!all.length){box.append(el('div','empty','مفيش قائمة أوامر وصلت لسه. تأكد إن الفيرموير محدّث.'));return}
   const hid=new Set(hidden||[]);
-  const list=editing?cmds:cmds.filter(c=>!hid.has(c.id));
+  const list=editing?all:all.filter(c=>!hid.has(c.id));
   if(!list.length){box.append(el('div','empty','كل الأوامر مخفية. دوس "تعديل" لإظهارها.'));return}
   const groups={};list.forEach(c=>{const k=c.cat||'عام';(groups[k]=groups[k]||[]).push(c)});
   const grid=el('div','grid');
